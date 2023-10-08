@@ -34,7 +34,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	product.Name = "iPhone Updated"
+	product.Name = "Product deleted"
 	err = updateProduct(db, product)
 	if err != nil {
 		panic(err)
@@ -51,6 +51,11 @@ func main() {
 	}
 	for _, v := range products {
 		fmt.Printf("%v\n", v)
+	}
+
+	err = deleteProducById(db, p.ID)
+	if err != nil {
+		panic(err)
 	}
 }
 
@@ -111,4 +116,17 @@ func getAllProducts(db *sql.DB) ([]Product, error) {
 		products = append(products, p)
 	}
 	return products, nil
+}
+
+func deleteProducById(db *sql.DB, id string) error {
+	stmt, err := db.Prepare("delete from products where id = ?")
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+	_, err = stmt.Exec(id)
+	if err != nil {
+		return err
+	}
+	return nil
 }
