@@ -34,7 +34,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	product.Name = "iPhone3"
+	product.Name = "iPhone Updated"
 	err = updateProduct(db, product)
 	if err != nil {
 		panic(err)
@@ -44,6 +44,14 @@ func main() {
 		panic(err)
 	}
 	fmt.Printf("%v\n", p)
+
+	products, err := getAllProducts(db)
+	if err != nil {
+		panic(err)
+	}
+	for _, v := range products {
+		fmt.Printf("%v\n", v)
+	}
 }
 
 func insertProduct(db *sql.DB, product *Product) error {
@@ -85,4 +93,22 @@ func getProductById(db *sql.DB, id string) (*Product, error) {
 		return nil, err
 	}
 	return &p, nil
+}
+
+func getAllProducts(db *sql.DB) ([]Product, error) {
+	row, err := db.Query("select id, name, price from products")
+	if err != nil {
+		return nil, err
+	}
+	defer row.Close()
+	var products []Product
+	for row.Next() {
+		var p Product
+		err = row.Scan(&p.ID, &p.Name, &p.Price)
+		if err != nil {
+			return nil, err
+		}
+		products = append(products, p)
+	}
+	return products, nil
 }
